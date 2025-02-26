@@ -1,0 +1,26 @@
+samples:
+  control:
+    - Sham1.bedgraph
+    - Sham2.bedgraph
+    - Sham3.bedgraph
+    - Sham4.bedgraph
+  1hr:
+    - 1hr1.bedgraph
+    - 1hr2.bedgraph
+    - 1hr3.bedgraph
+    - 1hr4.bedgraph
+  6hr:
+    - 6hr1.bedgraph
+    - 6hr2.bedgraph
+    - 6hr3.bedgraph
+    - 6hr4.bedgraph
+  24hr:
+    - 24hr1.bedgraph
+    - 24hr2.bedgraph
+    - 24hr3.bedgraph
+    - 24hr4.bedgraph
+
+files:
+    output_dir: "./metagene"
+    3UTR: "./3UTR.bed"
+    Stop: "./stop_codon.bed"

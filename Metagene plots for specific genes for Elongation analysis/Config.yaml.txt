@@ -1,0 +1,25 @@
+samples:
+  control:
+    - Sham1.bam
+    - Sham2.bam
+    - Sham3.bam
+    - Sham4.bam
+  1hr:
+    - 1hr1.bam
+    - 1hr2.bam
+    - 1hr3.bam
+    - 1hr4.bam
+  6hr:
+    - 6hr1.bam
+    - 6hr2.bam
+    - 6hr3.bam
+    - 6hr4.bam
+  24hr:
+    - 24hr1.bam
+    - 24hr2.bam
+    - 24hr3.bam
+    - 24hr4.bam
+max_threads: auto
+output_dir: "./metagene"
+annotation_file: "./annotation.gtf"
+gene_list: "./genes.txt"  # Text file with one gene name per line

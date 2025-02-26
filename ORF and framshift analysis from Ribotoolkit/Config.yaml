@@ -1,0 +1,26 @@
+samples:
+  control:
+    - Sham1.csv
+    - Sham2.csv
+    - Sham3.csv
+    - Sham4.csv
+  1hr:
+    - 1hr1.csv
+    - 1hr2.csv
+    - 1hr3.csv
+    - 1hr4.csv
+  6hr:
+    - 6hr1.csv
+    - 6hr2.csv
+    - 6hr3.csv
+    - 6hr4.csv
+  24hr:
+    - 24hr1.csv
+    - 24hr2.csv
+    - 24hr3.csv
+    - 24hr4.csv
+
+control_condition: "control"
+
+max_threads: 20  # Uses the max available CPU cores
+output_directory: "./ORF"

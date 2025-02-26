@@ -1,0 +1,33 @@
+samples:
+  control:
+    - Sham1.bed
+    - Sham2.bed
+    - Sham3.bed
+    - Sham4.bed
+  1hr:
+    - 1hr1.bed
+    - 1hr2.bed
+    - 1hr3.bed
+    - 1hr4.bed
+  6hr:
+    - 6hr1.bed
+    - 6hr2.bed
+    - 6hr3.bed
+    - 6hr4.bed
+  24hr:
+    - 24hr1.bed
+    - 24hr2.bed
+    - 24hr3.bed
+    - 24hr4.bed
+
+control_condition: "control"
+
+max_threads: auto  # Uses the max available CPU cores
+
+analyses:
+  map_CDS: yes
+  map_3UTR: yes
+  
+annotations:
+  map_CDS: "filtered_CDS.bed"
+  map_3UTR: "3UTR.bed"
