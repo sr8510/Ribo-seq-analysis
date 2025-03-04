@@ -7,15 +7,18 @@ How to generate annotation files used in the analysis:
 First, prepare the annotation file for the generation of bed files:
 
 gffread annotation.gtf -T -o annotation.gtf
+
 gtf2bed --gtf annotation.gtf --bed annotation.bed
 
 #generation of CDS annotation
+
 awk '$3 == "CDS" {
     match($0, /gene_name "([^"]+)"/, gname);
     if (gname[1] != "") print $1"\t"$4-1"\t"$5"\t"gname[1]"\t.\t"$7
 }' annotation.gtf > annotation_CDS.bed
 
 #generation for CDS annotation with exclusion of the first 18 and last 15 nucleotides:
+
 awk '$3 == "CDS" {
     print $1 "\t" ($4-1) "\t" ($4+17) "\t.\t.\t" $7;  # First 18 nt
     print $1 "\t" ($5-15) "\t" $5 "\t.\t.\t" $7;      # Last 15 nt
@@ -91,6 +94,7 @@ grep ">" out.fasta
 sed 's/N/A/g' out.fasta > out_clean.fasta #use this file.
 
 **How to run scripts:**
+
 **SCRT:**
 python RRS.py
 
