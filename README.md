@@ -32,7 +32,6 @@ $3 == "CDS" {
     gene_id = (gid[1] != "") ? gid[1] : "NA";
     transcript_id = (tid[1] != "") ? tid[1] : "NA";
     transcript_key = gene_id ";" transcript_id;
-
     if (!last_CDS_end[transcript_key] || $5 > last_CDS_end[transcript_key]) {
         last_CDS_end[transcript_key] = $5;
         last_CDS_chr[transcript_key] = $1;
@@ -65,7 +64,6 @@ $3 == "CDS" {
     gene_id = (gid[1] != "") ? gid[1] : "NA";
     transcript_id = (tid[1] != "") ? tid[1] : "NA";
     transcript_key = gene_id ";" transcript_id;
-
     if (!last_CDS_end[transcript_key] || $5 > last_CDS_end[transcript_key]) {
         last_CDS_end[transcript_key] = $5;
         last_CDS_chr[transcript_key] = $1;
@@ -95,21 +93,30 @@ sed 's/N/A/g' out.fasta > out_clean.fasta #use this file.
 **How to run scripts:**
 **SCRT:**
 python RRS.py
+
 **Stop codon context:**
 python stop_codon_context_CDS.py -i “SCRT statistics file from SCRT analysis” -f “CDS fasta” -t “Number of threads” -o “output directory
+
 **Stop codon context statistical analysis:**
 python stop_codon_context_stats.py
+
 **Metagene around 3’UTR:**
 python Metagene-3UTR.py
+
 **Elongation analysis:**
 python elongation_analysis.py config config.yaml
+
 **Metagene for specific genes CDS (linked to elongation analysis):**
 python metagene.py
+
 **Protein prediction for SCRT events:**
 python extract_cds.py transcriptome.fasta gene_list.txt
+
 **Active ORF analysis (using Ribotoolkit input):**
 python ORF.py
+
 python analysis.py -s limma.csv -o outdir/name #for analyzing amino acids sequences and types of ORFs
+
 **Gene-level frameshift analysis:**
 python frameshift.py Config.yaml
 """
