@@ -116,13 +116,15 @@ python metagene.py
 **Protein prediction for SCRT events:**
 python extract_cds.py transcriptome.fasta gene_list.txt
 
-**Active ORF analysis (using Ribotoolkit input):**
-python ORF.py
-
-python analysis.py -s limma.csv -o outdir/name #for analyzing amino acids sequences and types of ORFs
-
 **Gene-level frameshift analysis:**
-python frameshift.py Config.yaml
+python frameshift.py Config.yaml 
+
+**Active ORF analysis (using Ribotoolkit input):**
+python ORF.py #this script uses the translatedORF csv file output of the single sample analysis of Ribotoolkit as input. 
+
+python analysis.py -s limma.csv -o outdir/name #for analyzing amino acids sequences and types of ORFs. This script is used on the Limma output. Make sure to use the annotation output file from the ORF.py script to annotate the Limma output so the necessary info are included in the final file
+
+
 """
 
 
