@@ -5,6 +5,8 @@ import numpy as np
 from scipy.stats import mannwhitneyu
 from multiprocessing import Pool, cpu_count
 import os
+import re
+from pathlib import Path
 
 # Load Config.yaml
 with open("Config.yaml", "r") as config_file:
@@ -17,8 +19,7 @@ cds_bed = config['annotations']['map_CDS']
 utr_bed = config['annotations']['map_3UTR']
 
 # Create output directories
-os.makedirs("counts", exist_ok=True)
-os.makedirs("results", exist_ok=True)
+os.makedirs("SCRT_counts", exist_ok=True)
 
 # Function to count reads using bedtools intersect
 def count_reads(sample, bed_file):
@@ -36,7 +37,7 @@ def count_reads(sample, bed_file):
 def process_sample(sample, sample_type):
     cds_counts = count_reads(sample, cds_bed)
     utr_counts = count_reads(sample, utr_bed)
-    output_file = f"counts/{sample_type}_{os.path.basename(sample).replace('.bed', '')}_counts.csv"
+    output_file = f"SCRT_counts/{sample_type}_{os.path.basename(sample).replace('.bed', '')}_counts.csv"
     with open(output_file, "w") as out:
         out.write("Gene,CDS_counts,UTR_counts,RRS\n")
         for gene in set(cds_counts.keys()).union(utr_counts.keys()):
@@ -56,53 +57,34 @@ def process_all_samples():
         result_files = pool.starmap(process_sample, sample_files)
     return result_files
 
-# Function to perform statistical analysis for each condition vs control
-def statistical_analysis(result_files):
-    sample_data = {}
-    for result_file in result_files:
-        df = pd.read_csv(result_file)
-        condition = os.path.basename(result_file).split('_')[0]
-        if condition not in sample_data:
-            sample_data[condition] = {}
-        for _, row in df.iterrows():
-            gene = row['Gene']
-            if gene not in sample_data[condition]:
-                sample_data[condition][gene] = []
-            sample_data[condition][gene].append(row['RRS'])
-    
-    for condition in sample_data.keys():
-        if condition == control_condition:
-            continue
-        gene_stats = {}
-        for gene in set(g for cond in sample_data for g in sample_data[cond]):
-            control_rrs = sample_data[control_condition].get(gene, [0])
-            exp_rrs = sample_data[condition].get(gene, [0])
-            
-            # Check if all values are identical
-            if len(set(control_rrs + exp_rrs)) == 1:
-                p_value = 1  # Assign p-value of 1 for identical values
-            else:
-                _, p_value = mannwhitneyu(control_rrs, exp_rrs, alternative='two-sided')
-            
-            # Calculate fold change and then log2 transformation
-            fold_change = (np.mean(exp_rrs) + 1e-6) / (np.mean(control_rrs) + 1e-6)
-            log2fc = np.log2(fold_change)
-            
-            gene_stats[gene] = {
-                "log2FC": log2fc,
-                "p_value": p_value,
-                "avg_RRS_experiment": np.mean(exp_rrs),
-                "avg_RRS_control": np.mean(control_rrs)
-            }
-        
-        stats_df = pd.DataFrame.from_dict(gene_stats, orient='index')
-        stats_df.to_csv(f"results/statistical_analysis_{condition}_vs_control.csv", index_label="Gene")
+# Merge and filter to build a matrix of RRS values
+def tidy_sample_name(csv_path: str) -> str:
+    # "control_Sham1_counts.csv"  ->  "control_Sham1"
+    stem = os.path.basename(csv_path).replace("_counts.csv", "")
+    stem = re.sub(r"\.bed$", "", stem)
+    return stem
+
+def build_rrs_matrix(csv_files, min_reads=100, out_csv="SCRT_counts/RRS_matrix.csv"):
+    dfs      = []
+    for fp in csv_files:
+        df         = pd.read_csv(fp)
+        df["Total"] = df["CDS_counts"] + df["UTR_counts"]
+        df          = df[df["Total"] >= min_reads]                  # sample-specific filter
+        sample_name = tidy_sample_name(fp)
+        dfs.append(df[["Gene", "RRS"]].rename(columns={"RRS": sample_name}))
+
+    # successive outer-joins, then drop genes missing in any sample
+    merged = dfs[0]
+    for d in dfs[1:]:
+        merged = merged.merge(d, on="Gene", how="outer")
+
+    merged.dropna(inplace=True)  # keep genes that passed the filter in *all* samples
+    merged.to_csv(out_csv, index=False)
+    print(f"✓ merged matrix written to {out_csv}")
 
 # Main execution
 if __name__ == "__main__":
     print("Processing samples...")
     result_files = process_all_samples()
-    print("Performing statistical analysis...")
-    statistical_analysis(result_files)
-    print("Analysis complete. Results saved in 'results/statistical_analysis.csv'")
+    build_rrs_matrix(result_files)   
 
