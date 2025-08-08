@@ -22,7 +22,7 @@ samples:
 
 control_condition: "control"
 max_threads: auto
-output_dir: "./elongation_analysis_3"
+output_dir: "./elongation_analysis"
 annotation_file: "./annotation_CDS.bed"
 min_read_length: 25
 max_read_length: 35
